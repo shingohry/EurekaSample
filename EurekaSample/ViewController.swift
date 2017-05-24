@@ -16,6 +16,8 @@ class ViewController: FormViewController {
             +++ Section()
             <<< NameRow("NameRowTag") {
                 $0.title = "Name"
+            }.onChange {
+                print("Name changed:", $0.value ?? "");
             }
             
             <<< DateRow("BirthdayRowTag") {
@@ -71,9 +73,12 @@ class ViewController: FormViewController {
                 "Password:" + "●●●●●●" + "\n\n" +
                 "Location:" + location
         
-        let alert = UIAlertController(title: "Row values", message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-        
+        let alert = UIAlertController(title: "Row values",
+                                      message: message,
+                                      preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK",
+                                      style: .default,
+                                      handler: nil))
         present(alert, animated: true, completion: nil)
     }
 }
