@@ -16,10 +16,15 @@ class ViewController: FormViewController {
             +++ Section()
             <<< NameRow("NameRowTag") {
                 $0.title = "Name"
+                $0.add(rule: RuleRequired())
+                $0.validationOptions = .validatesOnBlur
             }.onChange {
                 print("Name changed:", $0.value ?? "");
+            }.cellUpdate { cell, row in
+                if !row.isValid {
+                    cell.titleLabel?.textColor = .red
+                }
             }
-            
             <<< DateRow("BirthdayRowTag") {
                 $0.title = "Birthday"
                 $0.value = Calendar(identifier: .gregorian).date(byAdding: .year, value: -20, to: Date())
@@ -28,9 +33,23 @@ class ViewController: FormViewController {
             +++ Section("Account")
             <<< EmailRow("EmailRowTag") {
                 $0.title = "Email"
+                $0.add(rule: RuleRequired())
+                $0.add(rule: RuleEmail())
+                $0.validationOptions = .validatesOnBlur
+            }.cellUpdate { cell, row in
+                if !row.isValid {
+                    cell.titleLabel?.textColor = .red
+                }
             }
             <<< PasswordRow("PasswordRowTag") {
                 $0.title = "Password"
+                $0.add(rule: RuleMinLength(minLength: 8))
+                $0.add(rule: RuleMaxLength(maxLength: 24))
+                $0.validationOptions = .validatesOnBlur
+            }.cellUpdate { cell, row in
+                if !row.isValid {
+                    cell.titleLabel?.textColor = .red
+                }
             }
             
             +++ Section("Other")
@@ -52,6 +71,12 @@ class ViewController: FormViewController {
     }
     
     func didTapSaveButton(sender: UIBarButtonItem) {
+        let errors = form.validate()
+        guard errors.isEmpty else {
+            print("validate errors:", errors)
+            return
+        }
+        
         // Get the value of a single row
         let nameRow = form.rowBy(tag: "NameRowTag") as! NameRow
         let name = nameRow.value!
